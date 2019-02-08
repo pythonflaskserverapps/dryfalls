@@ -1,14 +1,8 @@
 
-
-.vscode/*
-repos/*
-
-
 /test/*
 /build/*
 /dist/*
-/dryfalls.egg-info
+/${reponame}.egg-info
 
 /__pycache__/*
 /.pytest_cache/*
-

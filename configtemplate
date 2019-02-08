@@ -1,0 +1,21 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+	hideDotFiles = dotGitOnly
+[remote "github"]
+	url = https://github.com/${gituser}/${reponame}.git
+	fetch = +refs/heads/*:refs/remotes/github/*
+[remote "gitlab"]
+	url = https://gitlab.com/${gituser}/${reponame}.git
+	fetch = +refs/heads/*:refs/remotes/gitlab/*
+[user]
+	name = ${gituser}
+	email = ${gitmail}
+	[credential "https://github.com/${gituser}/${reponame}.git"]
+		username = ${gituser}
+    [credential "https://gitlab.com/${gituser}/${reponame}.git"]
+		username = ${gituser}

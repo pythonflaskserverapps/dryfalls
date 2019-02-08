@@ -1,0 +1,11 @@
+from ${reponame} import read_string_from_file
+
+############################################################
+
+def test_${reponame}():
+
+    print("testing ${reponame}")
+
+    assert read_string_from_file(None, "default") == "default"
+
+############################################################

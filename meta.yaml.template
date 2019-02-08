@@ -1,0 +1,23 @@
+package:
+  name: ${reponame}
+  version: "0.0.1"
+
+source:
+  git_rev: v0.0.1
+  git_url: https://github.com/${gituser}/${reponame}.git
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    
+
+test:
+  imports:
+    - ${reponame}
+
+about:
+  home: https://github.com/${gituser}/${reponame}
+  license: MIT
+  license_file: LICENSE

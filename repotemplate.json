@@ -1,0 +1,12 @@
+{
+    "idepath": "/Program Files (x86)/Microsoft VS Code/Code.exe",
+    "pythonpath": "/unzip/tools/miniconda/python.exe",
+    "gituser": "pythonflaskserverapps",
+    "gitpass": "",
+    "gitmail": "pythonflaskserverapps@gmail.com",
+    "project": {
+        "title": "Test project",
+        "shortDescription": "test project",
+        "description": "Test project."
+    }
+}

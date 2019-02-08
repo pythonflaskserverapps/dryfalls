@@ -1,22 +1,20 @@
 from setuptools import setup
-from dryfalls import read_string_from_file
+from ${reponame} import read_string_from_file
 
-setup(name='dryfalls',
-      version='0.0.4',
-      author='pythonflaskserverapps',
-      author_email='pythonflaskserverapps@gmail.com',
-      description='test project',
-      long_description=read_string_from_file("README.md", "Test project."),
+setup(name='${reponame}',
+      version='0.0.1',
+      author='${gituser}',
+      author_email='${gitmail}',
+      description='${projectShortDescription}',
+      long_description=read_string_from_file("README.md", "${projectDescription}"),
       long_description_content_type='text/markdown',
       license='MIT',
-      keywords="test project",
-      url='https://github.com/pythonflaskserverapps/dryfalls',            
-      packages=['dryfalls'],
+      keywords="${projectShortDescription}",
+      url='https://github.com/${gituser}/${reponame}',            
+      packages=['${reponame}'],
       test_suite="travis_test",
       python_requires=">=3.6",
-      install_requires=[  
-        "pyyaml==3.13",
-        "pygithub==1.43.5"
+      install_requires=[                
       ],
       classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -28,7 +26,7 @@ setup(name='dryfalls',
         'console_scripts': []
       },
       package_dir={
-        'dryfalls': 'dryfalls'
+        '${reponame}': '${reponame}'
       },
       include_package_data=False,
       zip_safe=False)
