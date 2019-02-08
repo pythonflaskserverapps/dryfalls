@@ -4,6 +4,7 @@ import argparse
 import subprocess
 from pathlib import Path
 from github import Github
+import pkg_resources
 
 ###################################################
 
@@ -37,31 +38,31 @@ def repoconfigpath(name = None):
     return repopath("{}.json".format(name))
 
 def creategitconfig(gituser, gitmail, reponame):
-    template = read_string_from_file("configtemplate", "")
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "configtemplate"), "")
     template = template.replace("${gituser}", gituser)
     template = template.replace("${gitmail}", gitmail)
     template = template.replace("${reponame}", reponame)
     return template
 
 def createreadme(title, description):
-    template = read_string_from_file("README.md.template", "")
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "README.md.template"), "")
     template = template.replace("${title}", title)
     template = template.replace("${description}", description)
     return template
 
 def creategitignore(reponame):
-    template = read_string_from_file("gitignore.template", "")
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "gitignore.template"), "")
     template = template.replace("${reponame}", reponame)    
     return template
 
 def createmetayaml(gituser, reponame):
-    template = read_string_from_file("meta.yaml.template", "")
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "meta.yaml.template"), "")
     template = template.replace("${gituser}", gituser)
     template = template.replace("${reponame}", reponame)
     return template
 
 def createsetuppy(gituser, gitmail, reponame, projectShortDescription, projectDescription):
-    template = read_string_from_file("setup.py.template", "")
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "setup.py.template"), "")
     template = template.replace("${gituser}", gituser)
     template = template.replace("${gitmail}", gitmail)
     template = template.replace("${reponame}", reponame)
@@ -70,7 +71,7 @@ def createsetuppy(gituser, gitmail, reponame, projectShortDescription, projectDe
     return template
 
 def createtravistest(reponame):
-    template = read_string_from_file("travistest.template", "")    
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "travistest.template"), "")    
     template = template.replace("${reponame}", reponame)
     return template
 
@@ -114,7 +115,7 @@ if args.create:
     if args.force:
         rmtree(repopath())
     create_dir(repopath())
-    write_string_to_file(repoconfigpath(), read_string_from_file("repotemplate.json", "{}"), force = args.force)    
+    write_string_to_file(repoconfigpath(), read_string_from_file(pkg_resources.resource_filename('dryfalls', "repotemplate.json"), "{}"), force = args.force)    
 
 if args.populate:
     reponame = args.populate
@@ -137,16 +138,16 @@ if args.populate:
     print("written .gitignore")
     write_string_to_file(repofilepath("README.md"), createreadme(projectTitle, projectDescription), force = args.force)    
     print("written README.md")
-    write_string_to_file(repofilepath("LICENSE"), read_string_from_file("LICENSE.template", ""), force = args.force)    
+    write_string_to_file(repofilepath("LICENSE"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "LICENSE.template"), ""), force = args.force)    
     print("written LICENSE")
-    write_string_to_file(repofilepath("bld.bat"), read_string_from_file("bld.bat.template", ""), force = args.force)    
-    write_string_to_file(repofilepath("build.sh"), read_string_from_file("build.sh.template", ""), force = args.force)    
+    write_string_to_file(repofilepath("bld.bat"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "bld.bat.template"), ""), force = args.force)    
+    write_string_to_file(repofilepath("build.sh"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "build.sh.template"), ""), force = args.force)    
     print("written PyPi build files")
     create_dir(repofilepath(reponame))
-    write_string_to_file(repofilepath(reponame + "/__init__.py"), read_string_from_file("initpy.template", ""))
+    write_string_to_file(repofilepath(reponame + "/__init__.py"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "initpy.template"), ""))
     print("created package dir")
-    write_string_to_file(repofilepath("Pipfile"), read_string_from_file("Pipfile.template", ""), force = args.force)    
-    write_string_to_file(repofilepath("Pipfile.lock"), read_string_from_file("Pipfile.lock.template", ""), force = args.force)    
+    write_string_to_file(repofilepath("Pipfile"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "Pipfile.template"), ""), force = args.force)    
+    write_string_to_file(repofilepath("Pipfile.lock"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "Pipfile.lock.template"), ""), force = args.force)    
     print("written pipfiles")
     write_string_to_file(repofilepath("meta.yaml"), createmetayaml(gituser, reponame), force = args.force)    
     print("written meta.yaml")

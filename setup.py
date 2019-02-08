@@ -2,7 +2,7 @@ from setuptools import setup
 from dryfalls import read_string_from_file
 
 setup(name='dryfalls',
-      version='0.0.4',
+      version='0.0.8',
       author='pythonflaskserverapps',
       author_email='pythonflaskserverapps@gmail.com',
       description='test project',
@@ -12,6 +12,7 @@ setup(name='dryfalls',
       keywords="test project",
       url='https://github.com/pythonflaskserverapps/dryfalls',            
       packages=['dryfalls'],
+      package_data={'dryfalls': ['*.*']},
       test_suite="travis_test",
       python_requires=">=3.6",
       install_requires=[  
