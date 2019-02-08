@@ -38,7 +38,9 @@ def repoconfigpath(name = None):
     return repopath("{}.json".format(name))
 
 def creategitconfig(gituser, gitmail, reponame):
-    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "configtemplate"), "")
+    resfilename = pkg_resources.resource_filename('dryfalls', "config.template")
+    print("config resource", resfilename)
+    template = read_string_from_file(resfilename, "")
     template = template.replace("${gituser}", gituser)
     template = template.replace("${gitmail}", gitmail)
     template = template.replace("${reponame}", reponame)
