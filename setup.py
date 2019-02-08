@@ -2,7 +2,7 @@ from setuptools import setup
 from dryfalls import read_string_from_file
 
 setup(name='dryfalls',
-      version='0.0.1',
+      version='0.0.2',
       author='pythonflaskserverapps',
       author_email='pythonflaskserverapps@gmail.com',
       description='test project',

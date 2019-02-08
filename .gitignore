@@ -2,7 +2,7 @@
 /test/*
 /build/*
 /dist/*
-/slapi.egg-info
+/dryfalls.egg-info
 
 /__pycache__/*
 /.pytest_cache/*
