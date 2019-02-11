@@ -72,9 +72,22 @@ def createsetuppy(gituser, gitmail, reponame, projectShortDescription, projectDe
     template = template.replace("${projectShortDescription}", projectShortDescription)
     return template
 
+def createinitpy():
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "__init__.py.template"), "")        
+    return template
+
+def createmainpy(reponame):
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "__main__.py.template"), "")    
+    template = template.replace("${reponame}", reponame)
+    return template
+
 def createtravistest(reponame):
     template = read_string_from_file(pkg_resources.resource_filename('dryfalls', "travistest.template"), "")    
     template = template.replace("${reponame}", reponame)
+    return template
+
+def createtravisyml():
+    template = read_string_from_file(pkg_resources.resource_filename('dryfalls', ".travis.yml.template"), "")        
     return template
 
 def readrepoconfigjson(name = None):    
@@ -96,6 +109,7 @@ parser.add_argument("--installvenv", help='install virtual env')
 parser.add_argument("--install", help='install virtual env')
 parser.add_argument("--module", help='module')
 parser.add_argument("--createdist", help='create dist')
+parser.add_argument("--runmain", help='run main')
 parser.add_argument("--twine", help='twine')
 parser.add_argument("--twinever", help='twine latest version')
 parser.add_argument("--setup", help='open setup')
@@ -104,6 +118,7 @@ parser.add_argument("--updatever", help='update version')
 parser.add_argument("--ver", help='version')
 parser.add_argument("--createrelease", help='create release')
 parser.add_argument('--force', action = "store_true", help='force')
+parser.add_argument('cmdargs', nargs = '*')
 
 args = parser.parse_args()
 
@@ -111,7 +126,7 @@ args = parser.parse_args()
 
 print(args)
 
-if args.create:    
+if args.create:
     reponame = args.create
     print("creating {} as {}".format(reponame, repopath()))
     if args.force:
@@ -146,7 +161,8 @@ if args.populate:
     write_string_to_file(repofilepath("build.sh"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "build.sh.template"), ""), force = args.force)    
     print("written PyPi build files")
     create_dir(repofilepath(reponame))
-    write_string_to_file(repofilepath(reponame + "/__init__.py"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "initpy.template"), ""))
+    write_string_to_file(repofilepath(reponame + "/__init__.py"), createinitpy(), "")
+    write_string_to_file(repofilepath(reponame + "/__main__.py"), createmainpy(reponame), "")
     print("created package dir")
     write_string_to_file(repofilepath("Pipfile"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "Pipfile.template"), ""), force = args.force)    
     write_string_to_file(repofilepath("Pipfile.lock"), read_string_from_file(pkg_resources.resource_filename('dryfalls', "Pipfile.lock.template"), ""), force = args.force)    
@@ -157,6 +173,8 @@ if args.populate:
     print("written setup.py")
     write_string_to_file(repofilepath("travis_test.py"), createtravistest(reponame), force = args.force)    
     print("written travis test")
+    write_string_to_file(repofilepath(".travis.yml"), createtravisyml(), force = args.force)    
+    print("written .travis.yml")
     write_string_to_file(repofilepath("VER"), "0.0.1", force = args.force)
     print("written version")
     g = Github(gituser, gitpass)
@@ -259,3 +277,7 @@ if args.createrelease:
     r = u.get_repo(reponame)
     r.create_git_release(tag, "release " + tag, "release " + tag)
     print("git release created")
+
+if args.runmain:
+    reponame = args.runmain
+    subprocess.Popen(["pipenv", "run", "python", "-m", reponame] + args.cmdargs, cwd = str(Path(repopath()))).wait()    
