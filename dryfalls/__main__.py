@@ -37,6 +37,8 @@ def repoconfigpath(name = None):
         name = reponame
     return repopath("{}.json".format(name))
 
+###################################################
+
 def creategitconfig(gituser, gitmail, reponame):
     resfilename = pkg_resources.resource_filename('dryfalls', "config.template")
     print("config resource", resfilename)
@@ -117,25 +119,54 @@ parser.add_argument("--code", help='open with vscode')
 parser.add_argument("--updatever", help='update version')
 parser.add_argument("--ver", help='version')
 parser.add_argument("--createrelease", help='create release')
+parser.add_argument('--init', help='init')
 parser.add_argument('--force', action = "store_true", help='force')
 parser.add_argument('cmdargs', nargs = '*')
 
 args = parser.parse_args()
 
+create = args.create
+setup = args.setup
+populate = args.populate
+commit = args.commit
+commitname = args.name
+push = args.push
+createvenv = args.createvenv
+installvenv = args.installvenv
+createdist = args.createdist
+twine = args.twine
+twinever = args.twinever
+createrelease = args.createrelease
+updatever = args.updatever
+
+if create:
+    setup = args.create    
+
+if args.init:
+    populate = args.init
+    commit = args.init
+    commitname = "Initial commit"   
+    push = args.init    
+    createvenv = args.init
+    installvenv = args.init
+    createdist = args.init
+    twine = args.init
+    createrelease = args.init
+
 ###################################################
 
 print(args)
 
-if args.create:
-    reponame = args.create
+if create:
+    reponame = create
     print("creating {} as {}".format(reponame, repopath()))
     if args.force:
         rmtree(repopath())
     create_dir(repopath())
     write_string_to_file(repoconfigpath(), read_string_from_file(pkg_resources.resource_filename('dryfalls', "repotemplate.json"), "{}"), force = args.force)    
 
-if args.populate:
-    reponame = args.populate
+if populate:
+    reponame = populate
     if args.force:
         print("removing .git")
         rmtree(repofilepath(".git"))
@@ -184,72 +215,20 @@ if args.populate:
             u.get_repo(reponame).delete()
             print("deleted github repo")
         except:
-            print("github repo does not exist")
+            print("could not delete repo")
     try:
         u.create_repo(reponame, description = projectShortDescription)
         print("created github repo")
     except:
-        print("github repo already exists")
-    if args.force:        
-        subprocess.Popen(["git", "add", "."], cwd = str(Path(repopath()))).wait()
-        subprocess.Popen(["git", "commit", "-m", "Initial commit"], cwd = str(Path(repopath()))).wait()
-        subprocess.Popen(["git", "push", "github", "master"], cwd = str(Path(repopath()))).wait()
+        print("could not create repo")
 
-if args.commit:
-    reponame = args.commit
-    commitname = args.name
-    subprocess.Popen(["git", "add", "."], cwd = str(Path(repopath()))).wait()
-    subprocess.Popen(["git", "commit", "-m", commitname], cwd = str(Path(repopath()))).wait()    
-
-if args.push:
-    reponame = args.push        
-    subprocess.Popen(["git", "push", "github", "master"], cwd = str(Path(repopath()))).wait()
-
-if args.createvenv:
-    reponame = args.createvenv
-    configjson = readrepoconfigjson()
-    pythonpath = configjson["pythonpath"]
-    subprocess.Popen(["pipenv", "--python", str(Path(pythonpath))], cwd = str(Path(repopath()))).wait()    
-
-if args.installvenv:
-    reponame = args.installvenv    
-    subprocess.Popen(["pipenv", "install"], cwd = str(Path(repopath()))).wait()    
-
-if args.install:
-    reponame = args.install    
-    module = args.module
-    subprocess.Popen(["pipenv", "install", module], cwd = str(Path(repopath()))).wait()    
-
-if args.createdist:
-    reponame = args.createdist    
-    subprocess.Popen(["pipenv", "run", "python", "setup.py", "sdist", "bdist_wheel"], cwd = str(Path(repopath()))).wait()    
-
-if args.twine:
-    reponame = args.twine
-    subprocess.Popen(["pipenv", "run", "python", "-m", "twine", "upload", "dist/*"], cwd = str(Path(repopath()))).wait()    
-
-if args.twinever:
-    reponame = args.twinever
-    curver = read_string_from_file(repofilepath("VER"), "0.0.1")
-    subprocess.Popen(["pipenv", "run", "python", "-m", "twine", "upload", "dist/{}-{}*".format(reponame, curver)], cwd = str(Path(repopath()))).wait()    
-
-if args.setup:
-    reponame = args.setup
-    path = str(Path("repos/{}.json".format(reponame)))    
-    configjson = readrepoconfigjson()
-    idepath = str(Path(configjson["idepath"]))
-    print("opening", path, "with", idepath)
-    subprocess.Popen([idepath, path])
-
-if args.code:
-    reponame = args.code
-    configjson = readrepoconfigjson()
-    idepath = str(Path(configjson["idepath"]))
-    subprocess.Popen([idepath, "."], cwd = str(Path(repopath())))
-
-if args.updatever:
-    reponame = args.updatever
+if updatever:
+    reponame = updatever
     ver = args.ver
+    if not ver:
+        ver = read_string_from_file(repofilepath("VER"), "0.0.1")
+        parts = ver.split(".")
+        ver = "{}.{}.{}".format(parts[0], parts[1], int(parts[2]) + 1)
     print("updating {} version to {}".format(reponame, ver))
     metayaml = read_string_from_file(repofilepath("meta.yaml"), "")
     parts = metayaml.split("version:")
@@ -263,9 +242,72 @@ if args.updatever:
     newsetuppy = setuppy.replace("version='{}'".format(curver), "version='{}'".format(ver))
     write_string_to_file(repofilepath("setup.py"), newsetuppy)
     write_string_to_file(repofilepath("VER"), ver)
+    if commitname:
+        commit = reponame
+        push = reponame
+        createdist = reponame
+        twinever = reponame
+        createrelease = reponame
 
-if args.createrelease:
-    reponame = args.createrelease
+if commit:
+    reponame = commit    
+    subprocess.Popen(["git", "add", "."], cwd = str(Path(repopath()))).wait()    
+    subprocess.Popen(["git", "commit", "-m", commitname], cwd = str(Path(repopath()))).wait()    
+
+if push:
+    reponame = push        
+    subprocess.Popen(["git", "push", "github", "master"], cwd = str(Path(repopath()))).wait()
+
+if createvenv:
+    reponame = createvenv
+    configjson = readrepoconfigjson()
+    pythonpath = configjson["pythonpath"]
+    subprocess.Popen(["pipenv", "--python", str(Path(pythonpath))], cwd = str(Path(repopath()))).wait()    
+
+if installvenv:
+    reponame = installvenv    
+    subprocess.Popen(["pipenv", "install"], cwd = str(Path(repopath()))).wait()    
+
+if args.install:
+    reponame = args.install    
+    module = args.module
+    subprocess.Popen(["pipenv", "install", module], cwd = str(Path(repopath()))).wait()    
+
+if createdist:
+    reponame = createdist    
+    subprocess.Popen(["pipenv", "run", "python", "setup.py", "sdist", "bdist_wheel"], cwd = str(Path(repopath()))).wait()    
+
+if twine:
+    reponame = twine
+    try:
+        subprocess.Popen(["pipenv", "run", "python", "-m", "twine", "upload", "dist/*"], cwd = str(Path(repopath()))).wait()    
+    except:
+        print("could not twine")
+
+if twinever:
+    reponame = twinever
+    curver = read_string_from_file(repofilepath("VER"), "0.0.1")
+    try:
+        subprocess.Popen(["pipenv", "run", "python", "-m", "twine", "upload", "dist/{}-{}*".format(reponame, curver)], cwd = str(Path(repopath()))).wait()    
+    except:
+        print("could not twine ver")
+
+if setup:
+    reponame = setup
+    path = str(Path("repos/{}.json".format(reponame)))    
+    configjson = readrepoconfigjson()
+    idepath = str(Path(configjson["idepath"]))
+    print("opening", path, "with", idepath)
+    subprocess.Popen([idepath, path])
+
+if args.code:
+    reponame = args.code
+    configjson = readrepoconfigjson()
+    idepath = str(Path(configjson["idepath"]))
+    subprocess.Popen([idepath, "."], cwd = str(Path(repopath())))
+
+if createrelease:
+    reponame = createrelease
     ver = read_string_from_file(repofilepath("VER"), "0.0.1")
     tag = "v" + ver
     print("creating release {} for {}".format(ver, reponame))
