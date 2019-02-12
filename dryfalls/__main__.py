@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from github import Github
 import pkg_resources
+import webbrowser
 
 ###################################################
 
@@ -95,6 +96,16 @@ def createtravisyml():
 def readrepoconfigjson(name = None):    
     return read_json_from_file(repoconfigpath(name), {})
 
+def giturl(kind = "github", user = None, name = None):
+    global reponame
+    if not name:
+        name = reponame
+    configjson = readrepoconfigjson()
+    print(configjson)
+    if not user:
+        user = configjson["gituser"]
+    return "https://{}.com/{}/{}".format(kind, user, name)
+
 ###################################################
 
 create_dir("repos")
@@ -106,6 +117,8 @@ parser.add_argument('--populate', help='populate repo')
 parser.add_argument('-c', "--commit", help='create commit')
 parser.add_argument("--name", help='commit name')
 parser.add_argument('-p', "--push", help='push')
+parser.add_argument('-u', "--upload", help='commit and push')
+parser.add_argument('-o', "--open", help='open git')
 parser.add_argument("--createvenv", help='create virtual env')
 parser.add_argument("--installvenv", help='install virtual env')
 parser.add_argument("--install", help='install virtual env')
@@ -131,6 +144,8 @@ populate = args.populate
 commit = args.commit
 commitname = args.name
 push = args.push
+upload = args.upload
+open = args.open
 createvenv = args.createvenv
 installvenv = args.installvenv
 createdist = args.createdist
@@ -138,6 +153,11 @@ twine = args.twine
 twinever = args.twinever
 createrelease = args.createrelease
 updatever = args.updatever
+
+if upload:
+    commit = upload
+    push = upload
+    open = upload
 
 if create:
     setup = args.create    
@@ -323,3 +343,9 @@ if createrelease:
 if args.runmain:
     reponame = args.runmain
     subprocess.Popen(["pipenv", "run", "python", "-m", reponame] + args.cmdargs, cwd = str(Path(repopath()))).wait()    
+
+if open:
+    reponame = open
+    configjson = readrepoconfigjson()
+    url = giturl()
+    webbrowser.open(url)
