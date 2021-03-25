@@ -16,7 +16,7 @@ setup(name='dryfalls',
       test_suite="travis_test",
       python_requires=">=3.6",
       install_requires=[  
-        "pyyaml==3.13",
+        "pyyaml==5.4",
         "pygithub==1.43.5"
       ],
       classifiers=[
